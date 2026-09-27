@@ -18,20 +18,23 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Create Flutter Project
+      - name: Create fresh Flutter project
         run: |
-          rm -rf android ios web macos windows linux
-          flutter create --platforms=android .
+          flutter create -t app --platforms=android /tmp/colonel_pos_v6
+          cp pubspec.yaml /tmp/colonel_pos_v6/pubspec.yaml
+          cp -r lib /tmp/colonel_pos_v6/lib
 
-      - name: Restore V6 dependencies
+      - name: Get dependencies
+        working-directory: /tmp/colonel_pos_v6
         run: flutter pub get
 
       - name: Build APK
+        working-directory: /tmp/colonel_pos_v6
         run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: colonel-pos-v6-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: /tmp/colonel_pos_v6/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
